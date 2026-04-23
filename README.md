@@ -38,9 +38,7 @@ What interested me most about this project was the gap between information and e
 
 After my book *AI Moment* in early 2023, various AI experiments since then, and the small arcade game *Data Center Guardian* in winter 2025, I wanted to find out how far AI tools can push narrative, intellectually rich formats.
 
-Built with various AI tools for writing, voices, dramaturgy, and implementation. Co-creation, just like the book and the arcade game before it. And just like those earlier projects: a demanding process, despite all the AI tools involved.
-
-Future City Walk 2035 takes that line of work further — into interactive foresight.
+Built with various AI tools for writing, voices, dramaturgy, and implementation. Co-creation, just like the book and the arcade game before it. And just like those earlier projects: a demanding process, despite all AI involved.
 
 ## License
 
