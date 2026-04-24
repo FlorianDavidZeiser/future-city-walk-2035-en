@@ -15,7 +15,7 @@ Future City Walk 2035 is an interactive foresight experience. A 30-minute walk t
 
 ## What It's About
 
-Each city follows a different vision of urban life — and a different way things could play out. You follow four protagonists into their cities, make small decisions along the way, and piece together what happened. At the end, you get a personal "Foresight Profile."
+Each city follows a different vision of urban life and a different way things could play out. You follow four protagonists into their cities, make small decisions along the way, and piece together what happened. At the end, you get a personal "Foresight Profile."
 
 A note: these four futures aren't predictions. They're thought experiments.
 
