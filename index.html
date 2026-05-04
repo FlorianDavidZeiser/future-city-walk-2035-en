@@ -746,23 +746,45 @@ var btnDelay=8;
 return '<div class="wrap center"><p class="lbl an d1" style="color:var(--ac)">'+OUTRO.lbl+'</p>'
 +'<div class="an" style="animation:netNode .8s ease both;animation-delay:.5s;min-height:50vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">'
 +'<div style="width:10px;height:10px;border-radius:50%;background:var(--ac);box-shadow:0 0 16px var(--ac);animation:outroPulse 2.4s ease-in-out infinite"></div>'
-+'<p style="color:var(--tx3);font-size:12px;letter-spacing:.2em;text-transform:uppercase">'+(localStorage.getItem(SOUND_KEY)==='1'?'\ud83d\udd0a listen':'')+'</p>'
++'<p style="color:var(--tx3);font-size:12px;letter-spacing:.2em;text-transform:uppercase">\ud83d\udd0a listen</p>'
 +'</div>'
-+(localStorage.getItem(SOUND_KEY)!=='1'?'<div class="an d3" style="max-width:500px;margin:0 auto;text-align:center;padding:0 20px">'+OUTRO.lines.map(function(l,i){return '<p class="an" style="color:var(--tx2);font-size:clamp(14px,2.5vw,17px);line-height:1.8;margin:20px 0;animation-delay:'+(i*2)+'s">'+nl(l)+'</p>';}).join('')+'</div>':'')
 +'<div class="an" style="animation:netNode .6s ease both;animation-delay:'+btnDelay+'s"><div class="mt3"><button class="btn bp" onclick="go(\'fin\')">To Results \u2192</button></div></div>'
 +'<div id="outroVoice"></div>'
 +'</div>';}
 
 function outroStart(){
-var sndOn=localStorage.getItem(SOUND_KEY)==='1';
-if(!sndOn||!VOICE.outro)return;
+if(!VOICE.outro)return;
 var v=VOICE.outro;
+try{SND.resume();}catch(e){}
 voiceActive=true;
 voiceAudio=new Audio(v.file);
 voiceAudio.volume=1.0;
-voiceAudio.onended=function(){voiceActive=false;};
-voiceAudio.onerror=function(){voiceActive=false;};
-voiceAudio.play().catch(function(){voiceActive=false;});
+voiceAudio.preload='auto';
+voiceAudio.onended=function(){voiceActive=false;var c=document.getElementById('outroVoice');if(c)c.innerHTML='';};
+voiceAudio.onerror=function(){voiceActive=false;showOutroPlayBtn(true);};
+var p=voiceAudio.play();
+if(p&&typeof p.catch==='function'){p.catch(function(){voiceActive=false;showOutroPlayBtn(false);});}
+}
+function showOutroPlayBtn(isErr){
+var c=document.getElementById('outroVoice');
+if(!c||c.querySelector('button'))return;
+var msg=isErr?'Audio konnte nicht geladen werden — erneut versuchen':'🔊 Outro abspielen';
+c.innerHTML='<div class="mt2 center an"><button class="btn bp" onclick="outroPlayManual()">'+msg+'</button></div>';
+}
+function outroPlayManual(){
+if(!VOICE.outro)return;
+var v=VOICE.outro;
+try{SND.resume();}catch(e){}
+if(voiceAudio){try{voiceAudio.pause();voiceAudio.src='';}catch(e){}voiceAudio=null;}
+voiceActive=true;
+voiceAudio=new Audio(v.file);
+voiceAudio.volume=1.0;
+voiceAudio.onended=function(){voiceActive=false;var c=document.getElementById('outroVoice');if(c)c.innerHTML='';};
+voiceAudio.onerror=function(){voiceActive=false;showOutroPlayBtn(true);};
+var p=voiceAudio.play();
+if(p&&typeof p.catch==='function'){p.catch(function(){voiceActive=false;showOutroPlayBtn(true);});}
+var c=document.getElementById('outroVoice');
+if(c)c.innerHTML='<p class="lbl an" style="color:var(--ac);text-align:center;margin-top:12px">🔊 playing…</p>';
 }
 
 function rFin(){var nodes='';FIN.imp.forEach(function(im,i){nodes+='<div class="net-node" style="animation-delay:'+(i*0.9)+'s"><h3>'+im.t+'</h3><p>'+nl(im.p)+'</p></div>';});var tot=SC.filter(function(_,i){return isSD(i);}).length;var px=S.px||0,py=S.py||0;var pt=getPlayerType(px,py);var xPct=Math.min(100,Math.max(0,50+(px/12)*50));var yPct=Math.min(100,Math.max(0,50+(py/12)*50));var xLbl=getAxisLabel(px,'System','Human');var yLbl=getAxisLabel(py,'Stability','Possibility');var mirror=getMirror(px,py);var mirrorHtml='';mirror.forEach(function(l){mirrorHtml+='<p style="color:var(--tx2);font-size:14px;line-height:1.7;padding:6px 0;border-bottom:1px solid var(--bd)">'+l+'</p>';});return '<div class="wrap"><p class="lbl an d1">Results</p><h1 class="an d1" style="font-size:clamp(20px,4vw,30px);margin:8px 0">'+FIN.t+'</h1><p class="an d2" style="color:var(--tx2);margin-bottom:20px">'+nl(FIN.intro)+'</p><div class="net-grid an d3">'+nodes+'</div><div class="mt3 an" style="animation:netNode .7s ease both;animation-delay:4.5s"><p class="lbl" style="margin-bottom:10px">Your Mirror</p><p style="color:var(--tx3);font-size:13px;margin-bottom:12px;font-style:italic">How you moved through each world:</p><div class="card" style="text-align:left;padding:16px 20px">'+mirrorHtml+'</div></div><div class="profile-card mt3 an" style="animation:netNode .8s ease both;animation-delay:5.5s" id="profileCard"><div style="font-size:56px;text-align:center;margin:8px 0">'+pt.icon+'</div><p class="profile-type" style="font-size:clamp(22px,4vw,32px)">'+pt.title+'</p><p style="color:var(--tx2);font-size:15px;line-height:1.7;text-align:center;margin-bottom:20px">'+pt.desc+'</p><div style="border-top:1px solid rgba(245,158,11,.2);padding-top:16px;margin-top:8px;text-align:center"><div style="font-size:40px;margin:4px 0">'+pt.toolIcon+'</div><p style="color:var(--ac);font-size:19px;font-weight:700;margin:4px 0">'+pt.tool+'</p><p style="color:var(--tx2);font-size:14px;line-height:1.6;font-style:italic">'+pt.toolDesc+'</p></div><div class="col" style="gap:8px;margin-top:20px"><div class="profile-trait"><span style="flex:0 0 90px;font-size:12px;text-transform:uppercase;letter-spacing:.08em">System \u2194 Human</span><div style="flex:1;background:var(--sf2);border-radius:3px;height:8px;overflow:hidden;position:relative"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--tx3);opacity:.3"></div><div class="trait-bar" style="width:'+xPct+'%;background:linear-gradient(90deg,#38bdf8,var(--ac))"></div></div><span style="flex:0 0 80px;text-align:right;font-size:11px;color:var(--tx3)">'+xLbl+'</span></div><div class="profile-trait"><span style="flex:0 0 90px;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Stability \u2194 Possibility</span><div style="flex:1;background:var(--sf2);border-radius:3px;height:8px;overflow:hidden;position:relative"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--tx3);opacity:.3"></div><div class="trait-bar" style="width:'+yPct+'%;background:linear-gradient(90deg,#4ade80,var(--ac))"></div></div><span style="flex:0 0 80px;text-align:right;font-size:11px;color:var(--tx3)">'+yLbl+'</span></div></div></div><div class="mt3 an" style="animation:netNode .6s ease both;animation-delay:6.5s;text-align:center"><div style="display:flex;justify-content:center"><button class="btn bp" onclick="downloadCard()" style="padding:10px 18px;font-size:14px">\ud83d\uddbc\ufe0f Save Profile Card</button></div></div><div class="fin-quote mt3 an" style="animation:netNode .6s ease both;animation-delay:7s">'+nl(FIN.end)+'</div><div class="an" style="animation:netNode .6s ease both;animation-delay:7.5s;margin-top:32px;padding:24px 20px;border:1px solid var(--ac2);border-radius:var(--R);background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(245,158,11,.02));text-align:center"><p style="color:var(--tx);font-size:16px;line-height:1.7;margin-bottom:16px">Did you enjoy this experience?<br>Share it with someone who wants to shape the future.</p><div style="display:flex;justify-content:center"><button class="btn bs" id="copyBtn" onclick="copyLink()" style="padding:10px 18px;font-size:13px">\ud83d\udd17 Copy Link</button></div></div><div class="mt3 center an" style="animation:netNode .6s ease both;animation-delay:8s"><button class="btn bg" onclick="go(\'map\')">Back to Overview</button></div></div>';}
